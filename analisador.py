@@ -76,7 +76,8 @@ class AnalisadorSintatico:
 
     def expressao(self):
         self.termo()
-        # print("expressao: ", self.tokens[self.posicao].valor)
+        print(token.valor)
+        print("expressao: ", self.tokens[self.posicao].valor)
         token = self.proximo_token()
         while token and token.valor in ["+", "-"]:
             self.proximo_token()  # Consumir operador
@@ -85,23 +86,25 @@ class AnalisadorSintatico:
 
     def termo(self):
         self.fator()
-        token = self.proximo_token()
-        # print("termo : ", token.valor)
+        if(self.tokens[self.posicao].valor != ','):
+            token = self.proximo_token()
+        print("termo : ", token.valor)
+        print("token 3: ", self.tokens[self.posicao].valor)
         while token and token.valor in ["*", "/"]:
             self.proximo_token()  # Consumir operador
             self.fator()
             token = self.proximo_token()
 
     def fator(self):
-        # print("token 1: ", self.tokens[self.posicao].valor)
+        print("token 1: ", self.tokens[self.posicao].valor)
         token = self.proximo_token()
-
+        print("token 2: ", self.tokens[self.posicao].valor)
         if token and token.classe == "identificador":
-            self.proximo_token()  # Consumir identificador
+            print()# Consumir identificador
         elif token and token.classe == "número":
-            self.proximo_token()  # Consumir número
+            print()  # Consumir número
         elif token and token.valor == "<":
-            # self.proximo_token()  # Consumir "<"
+            self.proximo_token()  # Consumir "<"
             self.expressao()
             token = self.proximo_token()
             if token and token.valor == ">":
@@ -160,13 +163,13 @@ class AnalisadorSintatico:
                 break
 
     def impressao(self):
-        # print("primeira: ", self.tokens[self.posicao].valor)
+        print("primeira: ", self.tokens[self.posicao].valor)
         self.lista_de_expressões()
 
     def lista_de_expressões(self):
         self.expressao()
         token = self.proximo_token()
-        # print("lista: ", token.valor)
+        print("lista: ", token.valor)
         while token and token.valor == ",":
             self.proximo_token()  # Consumir ","
             self.expressao()
