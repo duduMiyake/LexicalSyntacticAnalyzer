@@ -76,6 +76,7 @@ class AnalisadorSintatico:
 
     def expressao(self):
         self.termo()
+        # print("expressao: ", self.tokens[self.posicao].valor)
         token = self.proximo_token()
         while token and token.valor in ["+", "-"]:
             self.proximo_token()  # Consumir operador
@@ -85,19 +86,22 @@ class AnalisadorSintatico:
     def termo(self):
         self.fator()
         token = self.proximo_token()
+        # print("termo : ", token.valor)
         while token and token.valor in ["*", "/"]:
             self.proximo_token()  # Consumir operador
             self.fator()
             token = self.proximo_token()
 
     def fator(self):
+        # print("token 1: ", self.tokens[self.posicao].valor)
         token = self.proximo_token()
+
         if token and token.classe == "identificador":
             self.proximo_token()  # Consumir identificador
         elif token and token.classe == "número":
             self.proximo_token()  # Consumir número
         elif token and token.valor == "<":
-            self.proximo_token()  # Consumir "<"
+            # self.proximo_token()  # Consumir "<"
             self.expressao()
             token = self.proximo_token()
             if token and token.valor == ">":
@@ -156,12 +160,13 @@ class AnalisadorSintatico:
                 break
 
     def impressao(self):
-        self.proximo_token()  # Consumir "PRINT"
+        # print("primeira: ", self.tokens[self.posicao].valor)
         self.lista_de_expressões()
 
     def lista_de_expressões(self):
         self.expressao()
         token = self.proximo_token()
+        # print("lista: ", token.valor)
         while token and token.valor == ",":
             self.proximo_token()  # Consumir ","
             self.expressao()
@@ -192,14 +197,61 @@ class AnalisadorSintatico:
 
 # Exemplo de uso
 tokens = [
-    Token("READ", "res"),  # Comando de leitura
-    Token("x", "identificador"),  # Variável a ser lida
-    Token(",", "sim"),  # Separador de variáveis
-    Token("y", "identificador"),  # Outra variável a ser lida
-    Token(";", "sim"),  # Fim do comando
+    Token("READ", "res"),  
+    Token("x", "identificador"),  
+    Token(",", "sim"), 
+    Token("y", "identificador"),  
+    Token(";", "sim"), 
     Token("END", "res")
 ]
 
+tokens1 = [
+    Token("LET", "res"),  
+    Token("x", "identificador"),  
+    Token(":=", "sim"),
+    Token("5", "número"),  
+    Token(";", "sim"),  
+    Token("END", "res")
+]
 
-analisador = AnalisadorSintatico(tokens)
+tokens2 = [
+    Token("PRINT", "res"), 
+    Token("x", "identificador"),  
+    Token(",", "sim"),  
+    Token("y", "identificador"), 
+    Token(";", "sim"),  
+    Token("END", "res")
+]
+
+tokens3 = [
+    Token("IF", "res"),  
+    Token("x", "identificador"),  
+    Token(">", "sim"),  
+    Token("y", "identificador"),  
+    Token("THEN", "res"), 
+    Token("PRINT", "res"),  
+    Token("x", "identificador"),  
+    Token(";", "sim"),  
+    Token("ELSE", "res"),  
+    Token("PRINT", "res"),  
+    Token("y", "identificador"),  
+    Token(";", "sim"),  
+    Token("END", "res")
+]
+
+tokens4 = [
+    Token("GO", "res"), 
+    Token("TO", "res"),  
+    Token("rótulo1", "rótulo"),  
+    Token(";", "sim"), 
+    Token("END", "res"),
+    Token("rótulo1", "rótulo"),  
+    Token(":", "sim"), 
+    Token("PRINT", "res"),  
+    Token("x", "identificador"), 
+    Token(";", "sim")  
+]
+
+
+analisador = AnalisadorSintatico(tokens2)
 analisador.programa()
