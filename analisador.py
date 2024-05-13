@@ -17,21 +17,35 @@ class AnalisadorSintatico:
     def programa(self):
         self.sequencia_de_comandos()
         # token = self.proximo_token()
-        token = self.tokens[self.posicao - 1].valor
+        token = self.tokens[self.posicao].valor
         print("fim de comando: ", token)
         if token == "END":
-            print("Análise sintática finalizada!")
+            if self.tokens[self.posicao - 1].valor == ';':
+                print("Análise sintática finalizada!")
+            else: 
+                print("Erro! Esperado ; antes de END")
         else:
             print("Erro! Esperado 'END'.")
 
     def sequencia_de_comandos(self):
         while True:
+            print("iniciar cmando: ", self.tokens[self.posicao].valor)
             self.comando()
-            print(self.tokens[self.posicao - 1].valor)  #ver por que isso esta dando = a ELSE n tokens3
-            token = self.proximo_token()
-            # print("ponto: ", token.valor)
+            print("depois de cmando ", self.tokens[self.posicao].valor)  #ver por que isso esta dando = a ELSE n tokens3
+            token = self.tokens[self.posicao]
+            print("ponto: ", token.valor)
             if not token or token.valor != ";":
                 break
+            if token.valor == ";":
+                try:
+                    if self.tokens[self.posicao + 1].valor == 'END':
+                        self.proximo_token()
+                        break
+                    else:
+                        pass
+                except:
+                    print('Esperava-se algo depois da virgula')
+                    break
 
     def comando(self):
         token = self.proximo_token()
@@ -44,7 +58,6 @@ class AnalisadorSintatico:
             self.leitura()
         elif token.valor == "PRINT":
             self.impressao()
-            # print("print do: ",self.tokens[self.posicao].valor)
         elif token.valor == "IF":
             self.decisao()
         elif token.classe == "rótulo":
@@ -74,6 +87,7 @@ class AnalisadorSintatico:
         print("depois do term")
         token = self.tokens[self.posicao]
         print("TOKEN 2: ", token.valor, token.classe)
+        print(self.tokens[self.posicao].valor)
         while token and token.valor in ["+", "-"]:
             self.proximo_token()  # Consumir operador
             self.termo()
@@ -109,36 +123,55 @@ class AnalisadorSintatico:
             print("Erro! Fator inválido.")
 
     def desvio(self):
-        self.proximo_token()  # Consumir "GO"
-        token = self.proximo_token()
+        token = self.tokens[self.posicao]
         if token and token.valor == "TO":
+            print("entrou no to: ", self.tokens[self.posicao].valor)
             self.proximo_token()  # Consumir "TO"
-            token = self.proximo_token()
+            token = self.tokens[self.posicao]
             if token and token.classe == "rótulo":
+                print("entrou na classe rotulo: ", self.tokens[self.posicao].valor)
                 self.proximo_token()  # Consumir rótulo
-                token = self.proximo_token()
-                if token and token.valor == "OF":
-                    self.proximo_token()  # Consumir "OF"
+                token = self.tokens[self.posicao]
+                if token and token.valor == ";":
+                    self.proximo_token()
                     self.lista_de_rótulos()
-                else:
-                    print("Erro! Esperado 'OF' após rótulo.")
+                    self.comando()
+                elif token and token.valor != ";":
+                    print("Erro! Esperado ;")
+
+                # if token and token.valor == "OF":
+                #     print("entrou em OF: ", self.tokens[self.posicao].valor)
+                #     self.proximo_token()  # Consumir "OF"
+                #     self.lista_de_rótulos()
+                # else:
+                #     print("Erro! Esperado 'OF' após rótulo.")
             else:
                 print("Erro! Esperado rótulo.")
         elif token and token.classe == "rótulo":
             self.proximo_token()  # Consumir rótulo
         else:
             print("Erro! Desvio inválido.")
+        print("fim do desvio",self.tokens[self.posicao].valor)
 
     def lista_de_rótulos(self):
-        token = self.proximo_token()
-        while token and token.classe == "rótulo":
-            self.proximo_token()  # Consumir rótulo
-            token = self.proximo_token()
-            if token and token.valor == ",":
-                self.proximo_token()  # Consumir ","
-                token = self.proximo_token()
-            else:
+        token = self.tokens[self.posicao]
+        print("lista de rotulos: ", token.valor)
+        while token and token.classe != "rótulo":
+            self.proximo_token()
+            if(self.tokens[self.posicao].classe == "rótulo"):
+                self.proximo_token()
                 break
+        
+
+            # print("entrou no rtulo: ", self.tokens[self.posicao].valor)
+            # self.proximo_token()  # Consumir rótulo
+            # print("entrou no rtulo: ", self.tokens[self.posicao].valor)
+            # token = self.proximo_token()
+            # if token and token.valor == ",":
+            #     self.proximo_token()  # Consumir ","
+            #     token = self.proximo_token()
+            # else:
+            #     break
 
     def leitura(self):
         # self.proximo_token()  # Consumir "READ"
@@ -160,15 +193,22 @@ class AnalisadorSintatico:
         print("primeira: ", self.tokens[self.posicao].valor)
         self.lista_de_expressões()
 
+
     def lista_de_expressões(self):
         self.expressao()
-        print("depois da expressao: ", self.tokens[self.posicao].valor)
+        print("depois de expressao: ", self.tokens[self.posicao].valor)
         token = self.tokens[self.posicao]
-        print("lista: ", token.valor)
-        while token and token.valor == ",":
-            self.proximo_token()  # Consumir ","
-            self.expressao()
-            token = self.proximo_token()
+        print("depois da expressao: ", token.valor)
+        if token.classe == "identificador":
+            print("Erro! Esperado ',' entre identificadores")
+        else:
+            while token and token.valor == ",":
+                print("entes de tira virgula; ", self.tokens[self.posicao].valor)
+                self.proximo_token()  # Consumir ","
+                print("pulou , agra e: ", self.tokens[self.posicao].valor)
+                self.expressao()
+                print("saiu expressao ,: ",self.tokens[self.posicao].valor)
+                token = self.tokens[self.posicao]
 
     def decisao(self):
         print("token 1: ", self.tokens[self.posicao].valor)
@@ -178,8 +218,13 @@ class AnalisadorSintatico:
         if token and token.valor == "THEN":
             self.proximo_token()  # Consumir "THEN"
             self.comando()
-            token = self.proximo_token()
+            print("teste 2: ", self.tokens[self.posicao].valor)
+            if self.tokens[self.posicao].valor == ';':
+                self.proximo_token()
+
+            token = self.tokens[self.posicao]
             if token and token.valor == "ELSE":
+                print("entrou no else: ", self.tokens[self.posicao].valor)
                 self.proximo_token()  # Consumir "ELSE"
                 self.comando()
         else:
@@ -221,7 +266,7 @@ tokens2 = [
     Token("x", "identificador"),  
     Token(",", "sim"),  
     Token("y", "identificador"), 
-    # Token(";", "sim"),  
+    Token(";", "sim"),  
     Token("END", "res")
 ]
 
@@ -248,12 +293,13 @@ tokens4 = [
     Token(";", "sim"), 
     Token("END", "res"),
     Token("rótulo1", "rótulo"),  
-    Token(":", "sim"), 
     Token("PRINT", "res"),  
     Token("x", "identificador"), 
-    Token(";", "sim")  
+    Token(";", "sim"),
+    Token("END", "res")  
 ]
 
 
-analisador = AnalisadorSintatico(tokens1)
+
+analisador = AnalisadorSintatico(tokens4)
 analisador.programa()
