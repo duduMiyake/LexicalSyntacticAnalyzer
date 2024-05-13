@@ -27,9 +27,9 @@ class AnalisadorSintatico:
     def sequencia_de_comandos(self):
         while True:
             self.comando()
-            print(self.tokens[self.posicao].valor)  #ver por que isso esta dando = a ELSE n tokens3
+            print(self.tokens[self.posicao - 1].valor)  #ver por que isso esta dando = a ELSE n tokens3
             token = self.proximo_token()
-            print("ponto: ", token.valor)
+            # print("ponto: ", token.valor)
             if not token or token.valor != ";":
                 break
 
@@ -44,6 +44,7 @@ class AnalisadorSintatico:
             self.leitura()
         elif token.valor == "PRINT":
             self.impressao()
+            # print("print do: ",self.tokens[self.posicao].valor)
         elif token.valor == "IF":
             self.decisao()
         elif token.classe == "rótulo":
@@ -161,6 +162,7 @@ class AnalisadorSintatico:
 
     def lista_de_expressões(self):
         self.expressao()
+        print("depois da expressao: ", self.tokens[self.posicao].valor)
         token = self.tokens[self.posicao]
         print("lista: ", token.valor)
         while token and token.valor == ",":
@@ -219,7 +221,7 @@ tokens2 = [
     Token("x", "identificador"),  
     Token(",", "sim"),  
     Token("y", "identificador"), 
-    Token(";", "sim"),  
+    # Token(";", "sim"),  
     Token("END", "res")
 ]
 
@@ -253,5 +255,5 @@ tokens4 = [
 ]
 
 
-analisador = AnalisadorSintatico(tokens3)
+analisador = AnalisadorSintatico(tokens1)
 analisador.programa()
