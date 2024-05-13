@@ -27,7 +27,9 @@ class AnalisadorSintatico:
     def sequencia_de_comandos(self):
         while True:
             self.comando()
+            print(self.tokens[self.posicao].valor)  #ver por que isso esta dando = a ELSE n tokens3
             token = self.proximo_token()
+            print("ponto: ", token.valor)
             if not token or token.valor != ";":
                 break
 
@@ -88,12 +90,12 @@ class AnalisadorSintatico:
 
     def fator(self):
         print("token 4: ", self.tokens[self.posicao].valor)
-        token = self.proximo_token()
+        token = self.tokens[self.posicao]
         print("TOKEN 4: ", token.valor, token.classe)
         if token and token.classe == "identificador":
-            pass # Consumir identificador
+            self.proximo_token() # Consumir identificador
         elif token and token.classe == "número":
-            pass  # Consumir número
+            self.proximo_token()  # Consumir número
         elif token and token.valor == "<":
             self.proximo_token()  # Consumir "<"
             self.expressao()
@@ -159,7 +161,7 @@ class AnalisadorSintatico:
 
     def lista_de_expressões(self):
         self.expressao()
-        token = self.proximo_token()
+        token = self.tokens[self.posicao]
         print("lista: ", token.valor)
         while token and token.valor == ",":
             self.proximo_token()  # Consumir ","
