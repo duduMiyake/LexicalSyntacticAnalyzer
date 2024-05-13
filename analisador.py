@@ -17,25 +17,39 @@ class AnalisadorSintatico:
     def programa(self):
         self.sequencia_de_comandos()
         # token = self.proximo_token()
-        token = self.tokens[self.posicao - 1].valor
-        print("fim de comando: ", token)
+        token = self.tokens[self.posicao].valor
+        #print("fim de comando: ", token)
         if token == "END":
-            print("Análise sintática finalizada!")
+            if self.tokens[self.posicao - 1].valor == ';':
+                print("Análise sintática finalizada!")
+            else: 
+                print("Erro! Esperado ; antes de END")
         else:
             print("Erro! Esperado 'END'.")
 
     def sequencia_de_comandos(self):
         while True:
+            #print("iniciar cmando: ", self.tokens[self.posicao].valor)
             self.comando()
-            print(self.tokens[self.posicao].valor)  #ver por que isso esta dando = a ELSE n tokens3
-            token = self.proximo_token()
-            print("ponto: ", token.valor)
+            #print("depois de cmando ", self.tokens[self.posicao].valor)  #ver por que isso esta dando = a ELSE n tokens3
+            token = self.tokens[self.posicao]
+            #print("ponto: ", token.valor)
             if not token or token.valor != ";":
                 break
+            if token.valor == ";":
+                try:
+                    if self.tokens[self.posicao + 1].valor == 'END':
+                        self.proximo_token()
+                        break
+                    else:
+                        pass
+                except:
+                    print('Esperava-se algo depois da virgula')
+                    break
 
     def comando(self):
         token = self.proximo_token()
-        print("comeco do comando: ",token.valor)
+        #print("comeco do comando: ",token.valor)
         if token.valor == "LET":
             self.atribuicao()
         elif token.valor == "GO":
@@ -44,6 +58,7 @@ class AnalisadorSintatico:
             self.leitura()
         elif token.valor == "PRINT":
             self.impressao()
+            # print("print do: ",self.tokens[self.posicao].valor)
         elif token.valor == "IF":
             self.decisao()
         elif token.classe == "rótulo":
@@ -68,30 +83,31 @@ class AnalisadorSintatico:
             print("Erro! Esperado identificador.")
 
     def expressao(self):
-        print("token 2: ", self.tokens[self.posicao].valor)
+        #print("token 2: ", self.tokens[self.posicao].valor)
         self.termo()
-        print("depois do term")
+        #print("depois do term")
         token = self.tokens[self.posicao]
-        print("TOKEN 2: ", token.valor, token.classe)
+        #print("TOKEN 2: ", token.valor, token.classe)
+        #print(self.tokens[self.posicao].valor)
         while token and token.valor in ["+", "-"]:
             self.proximo_token()  # Consumir operador
             self.termo()
             token = self.proximo_token()
 
     def termo(self):
-        print("token 3: ", self.tokens[self.posicao].valor)
+        #print("token 3: ", self.tokens[self.posicao].valor)
         self.fator()
         token = self.tokens[self.posicao]
-        print("TOKEN 3: ", token.valor, token.classe)
+        #print("TOKEN 3: ", token.valor, token.classe)
         while token and token.valor in ["*", "/"]:
             self.proximo_token()  # Consumir operador
             self.fator()
             token = self.proximo_token()
 
     def fator(self):
-        print("token 4: ", self.tokens[self.posicao].valor)
+        #print("token 4: ", self.tokens[self.posicao].valor)
         token = self.tokens[self.posicao]
-        print("TOKEN 4: ", token.valor, token.classe)
+        #print("TOKEN 4: ", token.valor, token.classe)
         if token and token.classe == "identificador":
             self.proximo_token() # Consumir identificador
         elif token and token.classe == "número":
@@ -156,23 +172,31 @@ class AnalisadorSintatico:
                 break
 
     def impressao(self):
-        print("primeira: ", self.tokens[self.posicao].valor)
+        #print("primeira: ", self.tokens[self.posicao].valor)
         self.lista_de_expressões()
+
 
     def lista_de_expressões(self):
         self.expressao()
+        #print("depois de expressao: ", self.tokens[self.posicao].valor)
         token = self.tokens[self.posicao]
-        print("lista: ", token.valor)
-        while token and token.valor == ",":
-            self.proximo_token()  # Consumir ","
-            self.expressao()
-            token = self.proximo_token()
+        #print("depois da expressao: ", token.valor)
+        if token.classe == "identificador":
+            print("Erro! Esperado ',' entre identificadores")
+        else:
+            while token and token.valor == ",":
+                #print("entes de tira virgula; ", self.tokens[self.posicao].valor)
+                self.proximo_token()  # Consumir ","
+                #print("pulou , agra e: ", self.tokens[self.posicao].valor)
+                self.expressao()
+                #print("saiu expressao ,: ",self.tokens[self.posicao].valor)
+                token = self.tokens[self.posicao]
 
     def decisao(self):
-        print("token 1: ", self.tokens[self.posicao].valor)
+        #print("token 1: ", self.tokens[self.posicao].valor)
         self.comparação()
         token = self.tokens[self.posicao]
-        print("TOKEN 1: ", token.valor, token.classe)
+        #print("TOKEN 1: ", token.valor, token.classe)
         if token and token.valor == "THEN":
             self.proximo_token()  # Consumir "THEN"
             self.comando()
@@ -184,11 +208,11 @@ class AnalisadorSintatico:
             print("Erro! Esperado 'THEN' após comparação.")
 
     def comparação(self):
-        print("token 1.5: ", self.tokens[self.posicao].valor)
+        #print("token 1.5: ", self.tokens[self.posicao].valor)
         self.expressao()
-        print("token 1.55: ", self.tokens[self.posicao].valor)
+        #print("token 1.55: ", self.tokens[self.posicao].valor)
         token = self.tokens[self.posicao]
-        print("TOKEN 1.5: ", token.valor, token.classe)
+        #print("TOKEN 1.5: ", token.valor, token.classe)
         if token and token.classe == "operador de comparação":
             self.proximo_token()  # Consumir operador de comparação
             self.expressao()
@@ -253,5 +277,5 @@ tokens4 = [
 ]
 
 
-analisador = AnalisadorSintatico(tokens3)
+analisador = AnalisadorSintatico(tokens1)
 analisador.programa()
