@@ -202,22 +202,32 @@ class AnalisadorSintatico:
         self.proximo_token()    #consome o rotulo
         while True:
             #print("entrouRotuloDesejado")
-            # print("antes da virgula: ",self.tokens[self.posicao].valor)
+            #print("antes da virgula: ",self.tokens[self.posicao].valor)
             while self.tokens[self.posicao].valor == ',':
                 self.proximo_token()    #pula a virgula
                 rotuloDesejado.append(self.tokens[self.posicao].valor)
                 self.proximo_token()    #pula outro rotulo
             
-            # print("antes do ponto e virgula: ",self.tokens[self.posicao].valor)
+            #print("antes do ponto e virgula: ",self.tokens[self.posicao].valor)
 
             if self.tokens[self.posicao].valor == ';':
                 self.proximo_token()
 
-            # print("antes da funcao: ",self.tokens[self.posicao].valor)
+            #print("antes da funcao: ",self.tokens[self.posicao].valor)
             # print(rotuloDesejado[0], rotuloDesejado[1])
+            #print(self.tokens[self.posicao].valor)
+
+            if self.tokens[self.posicao].valor == 'END':
+                    self.proximo_token()
+                    if self.posicao >= len(self.tokens):
+                        print('Erro! Nao foi achado um identificador')
+                        self.posicao -= 1
+                        break
+
             if(self.tokens[self.posicao].valor in rotuloDesejado):
                 # print("encontrou oum rotulo: ", self.tokens[self.posicao].valor)
                 self.proximo_token()
+                #print(self.tokens[self.posicao].valor)
                 if(self.tokens[self.posicao].valor == idDesejado.valor):
                     #print("aqui: ",self.tokens[self.posicao].valor)
                     self.proximo_token()
